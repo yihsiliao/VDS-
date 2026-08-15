@@ -35,7 +35,7 @@
       <span class="text-xl">💧</span>
       <h1 class="text-xl font-bold tracking-wide">田間水管鋪設日報</h1>
     </div>
-    <p class="text-xs text-slate-400 mt-1">GitHub 託管 ‧ 自動推播與成本試算</p>
+    <p class="text-xs text-slate-400 mt-1">GitHub 託管 ‧ 自動純文字推播與成本試算</p>
   </div>
 
   <!-- 載入動畫 -->
@@ -364,167 +364,33 @@
       document.getElementById('previewCumulativeAvgCost').innerText = `$${globalCumulativeAvgCost.toLocaleString()} /分`;
     }
 
-    // ⭐️ 修正點：所有版面數值均符合 LINE Flex Schema 規範（僅使用 Enum 標籤如 "md", "lg", "xs"）
-    function buildLineFlexMessage(summary) {
-      const netHours = parseFloat(summary.netHours || 8.0);
+    // ⭐️ 生成高排版質感純文字日報訊息
+    function buildPlainTextSummary(s) {
+      const netHours = parseFloat(s.netHours || 8.0);
       const isOt = netHours > 8;
-      const unitCost = Number(summary.unitCost) || 0;
-      const cumAvgCost = Number(summary.cumAvgCost) || 0;
+      const totalArea = parseFloat(s.totalArea) || 0;
+      const unitCost = Number(s.unitCost) || 0;
+      const cumAvgCost = Number(s.cumAvgCost) || 0;
       const isCheaper = (unitCost - cumAvgCost) <= 0;
-      const totalArea = parseFloat(summary.totalArea) || 0;
-      const farmIdsStr = String(summary.farmIds || '無');
-      const staffNamesStr = String(summary.staffNames || '無');
-      const noteStr = String(summary.note || '無');
-      const dateStr = String(summary.date || '');
 
-      return {
-        type: "flex",
-        altText: `💧 田間水管鋪設日報 (${dateStr}) - 完工 ${totalArea.toFixed(2)} 分地`,
-        contents: {
-          type: "bubble",
-          size: "mega",
-          header: {
-            type: "box",
-            layout: "vertical",
-            backgroundColor: "#0f172a",
-            paddingAll: "lg",
-            contents: [
-              {
-                type: "box",
-                layout: "horizontal",
-                contents: [
-                  { type: "text", text: "💧 田間水管鋪設日報", weight: "bold", color: "#ffffff", size: "lg", flex: 1 },
-                  { type: "text", text: dateStr, color: "#94a3b8", size: "xs", align: "end", gravity: "center" }
-                ]
-              },
-              {
-                type: "text",
-                text: `⏰ 工時: ${summary.startTime || '08:00'}~${summary.endTime || '17:00'} (淨 ${netHours.toFixed(1)} hr${isOt ? ' ‧ 含加班' : ''})`,
-                color: "#94a3b8",
-                size: "xxs",
-                margin: "xs"
-              }
-            ]
-          },
-          body: {
-            type: "box",
-            layout: "vertical",
-            paddingAll: "lg",
-            spacing: "md",
-            contents: [
-              {
-                type: "box",
-                layout: "horizontal",
-                backgroundColor: "#f8fafc",
-                cornerRadius: "md",
-                paddingAll: "md",
-                contents: [
-                  {
-                    type: "box",
-                    layout: "vertical",
-                    align: "center",
-                    flex: 1,
-                    contents: [
-                      { type: "text", text: "今日完工面積", size: "xxs", color: "#64748b" },
-                      { type: "text", text: totalArea.toFixed(2), size: "xl", weight: "bold", color: "#10b981", margin: "xs" },
-                      { type: "text", text: "分地", size: "xxs", color: "#10b981" }
-                    ]
-                  },
-                  { type: "separator", color: "#e2e8f0" },
-                  {
-                    type: "box",
-                    layout: "vertical",
-                    align: "center",
-                    flex: 1,
-                    contents: [
-                      { type: "text", text: "今日單位成本", size: "xxs", color: "#64748b" },
-                      { type: "text", text: `$${Math.round(unitCost).toLocaleString()}`, size: "xl", weight: "bold", color: "#0284c7", margin: "xs" },
-                      { type: "text", text: "元/分", size: "xxs", color: "#0284c7" }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: "box",
-                layout: "horizontal",
-                backgroundColor: isCheaper ? "#f0fdf4" : "#fef2f2",
-                cornerRadius: "sm",
-                paddingAll: "sm",
-                contents: [
-                  {
-                    type: "text",
-                    text: `📊 全場歷史累積平均成本：$${Math.round(cumAvgCost).toLocaleString()} 元/分 (${isCheaper ? '🟢 低於平均' : '🔴 高於平均'})`,
-                    size: "xxs",
-                    color: isCheaper ? "#166534" : "#991b1b",
-                    align: "center",
-                    flex: 1
-                  }
-                ]
-              },
-              {
-                type: "box",
-                layout: "vertical",
-                margin: "md",
-                spacing: "sm",
-                contents: [
-                  {
-                    type: "box",
-                    layout: "horizontal",
-                    contents: [
-                      { type: "text", text: "📍 完工地號", color: "#64748b", size: "xs", flex: 2 },
-                      { type: "text", text: `${farmIdsStr} (${summary.farmCount || 0}塊地)`, color: "#0f172a", size: "xs", weight: "bold", flex: 4, align: "end", wrap: true }
-                    ]
-                  },
-                  {
-                    type: "box",
-                    layout: "horizontal",
-                    contents: [
-                      { type: "text", text: "👥 出勤人力", color: "#64748b", size: "xs", flex: 2 },
-                      { type: "text", text: `主管 ${summary.supervisorCount || 0} 人 / 組員 ${summary.workerCount || 0} 人`, color: "#0f172a", size: "xs", weight: "bold", flex: 4, align: "end" }
-                    ]
-                  },
-                  {
-                    type: "box",
-                    layout: "horizontal",
-                    contents: [
-                      { type: "text", text: "🏷️ 出勤人員", color: "#64748b", size: "xs", flex: 2 },
-                      { type: "text", text: staffNamesStr, color: "#334155", size: "xs", flex: 4, align: "end", wrap: true }
-                    ]
-                  },
-                  {
-                    type: "box",
-                    layout: "horizontal",
-                    contents: [
-                      { type: "text", text: "💰 今日總成本", color: "#64748b", size: "xs", flex: 2 },
-                      { type: "text", text: `$${Number(summary.totalCost || 0).toLocaleString()} 元`, color: "#d97706", size: "xs", weight: "bold", flex: 4, align: "end" }
-                    ]
-                  },
-                  {
-                    type: "box",
-                    layout: "horizontal",
-                    contents: [
-                      { type: "text", text: "📝 現場備註", color: "#64748b", size: "xs", flex: 2 },
-                      { type: "text", text: noteStr, color: "#334155", size: "xs", flex: 4, align: "end", wrap: true }
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          footer: {
-            type: "box",
-            layout: "vertical",
-            backgroundColor: "#f8fafc",
-            paddingAll: "md",
-            contents: [
-              { type: "text", text: "✅ 數據已自動同步寫入施工紀錄試算表", size: "xxs", color: "#94a3b8", align: "center" }
-            ]
-          }
-        }
-      };
+      return `💧【田間水管鋪設日報】\n` +
+             `📅 日期：${s.date}\n` +
+             `⏰ 工時：${s.startTime || '08:00'}~${s.endTime || '17:00'} (淨 ${netHours.toFixed(1)} hr${isOt ? ' ‧ 含加班' : ''})\n` +
+             `-------------------------\n` +
+             `📏 完工總面積：${totalArea.toFixed(2)} 分地 (${s.farmCount} 塊地)\n` +
+             `📍 完工地號：${s.farmIds}\n` +
+             `👥 出勤人力：主管 ${s.supervisorCount} 人 / 組員 ${s.workerCount} 人\n` +
+             `🏷️ 出勤人員：${s.staffNames || '無'}\n` +
+             `-------------------------\n` +
+             `💰 今日總成本：$${Number(s.totalCost).toLocaleString()} 元\n` +
+             `⚡ 今日單位成本：$${Math.round(unitCost).toLocaleString()} 元/分\n` +
+             `📊 歷史累積均價：$${Math.round(cumAvgCost).toLocaleString()} 元/分 (${isCheaper ? '🟢 低於平均' : '🔴 高於平均'})\n` +
+             `📝 現場備註：${s.note || '無'}\n` +
+             `-------------------------\n` +
+             `✅ 數據已自動同步至水管施工紀錄試算表`;
     }
 
-    // 表單送出與推播
+    // 表單送出與純文字推播
     document.getElementById('reportForm').onsubmit = function(e) {
       e.preventDefault();
 
@@ -562,7 +428,7 @@
         try {
           res = JSON.parse(text);
         } catch(e) {
-          throw new Error("Google 未回傳正確 JSON 格式。");
+          throw new Error("Google 未回傳 JSON。");
         }
 
         btn.disabled = false;
@@ -571,28 +437,32 @@
         if (res && res.success) {
           showToast('✅ 成功寫入試算表！');
           const summary = res.data;
-          const flexMsg = buildLineFlexMessage(summary);
 
-          // 1. 檢查是否在 LINE 內開啟
+          // 1. 建立純文字訊息物件
+          const textMsg = {
+            type: "text",
+            text: buildPlainTextSummary(summary)
+          };
+
+          // 2. 檢查開啟環境
           if (!liff.isInClient()) {
             alert('⚠️ 無法自動推播：因為您點擊的不是 LINE 聊天室內的專屬短網址 (liff.line.me)，或者非 LINE 內部開啟！');
             return;
           }
 
-          // 2. 檢查 sendMessages 函式是否存在
           if (typeof liff.sendMessages !== 'function') {
             alert('⚠️ 無法自動推播：目前的開啟情境不支援 sendMessages 函式。');
             return;
           }
 
-          // 3. 發送 Flex 卡片
-          liff.sendMessages([flexMsg])
+          // 3. 發送純文字訊息
+          liff.sendMessages([textMsg])
             .then(() => {
               showToast('🚀 已自動直接傳送到本聊天室！');
               setTimeout(() => liff.closeWindow(), 1200);
             })
             .catch(err => {
-              alert('❌ LINE 拒絕自動發送訊息！\n' +
+              alert('❌ LINE 拒絕發送訊息！\n' +
                     '錯誤代碼: ' + (err.code || '無') + '\n' +
                     '詳細原因: ' + (err.message || JSON.stringify(err)));
             });
