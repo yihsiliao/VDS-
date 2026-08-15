@@ -19,6 +19,7 @@
 <body class="p-4 pb-12 max-w-md mx-auto relative min-h-screen">
 
   <script>
+    // 已自動帶入您驗證成功的 API 網址
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzPmrPaafvH5hxtnzzGVHJQzmmoN7Yt8y4VUFiC33ptAR4TcdhxP5DLyc4QaC2-IyaZ/exec";
     const LIFF_ID = "2011118961-2eemCrBc";
   </script>
@@ -193,7 +194,7 @@
 
     document.getElementById('date').value = new Date().toISOString().split('T')[0];
 
-    // 順序控制：LIFF 初始化完成後，才進行 loadFarms()（兼具 3 秒超時備援）
+    // 順序控制：LIFF 初始化完成後才載入農地，同時具備 3 秒防卡超時機制
     window.onload = function() {
       renderStaffChips();
 
@@ -201,7 +202,7 @@
       const farmTimeout = setTimeout(() => {
         if (!loaded) {
           loaded = true;
-          console.warn('LIFF 初始化較慢，直接載入農地資料');
+          console.warn('LIFF 初始化時間較長，先行載入農地');
           loadFarms();
         }
       }, 3000);
@@ -236,7 +237,7 @@
       .then(res => res.text())
       .then(text => {
         try { return JSON.parse(text); } 
-        catch(e) { throw new Error("Google 未回傳 JSON。請確認 Apps Script 部署『誰有存取權』已設為『所有人』！"); }
+        catch(e) { throw new Error("Google 未回傳 JSON 格式。"); }
       })
       .then(onFarmsLoaded)
       .catch(onLoadError);
@@ -273,7 +274,6 @@
       setTimeout(() => hideToast(), 3500);
     }
 
-    // 補齊 hideToast 函式
     function hideToast() {
       const toast = document.getElementById('toast');
       if (toast) {
@@ -483,7 +483,7 @@
         try {
           res = JSON.parse(text);
         } catch(e) {
-          throw new Error("Google 未回傳正確 JSON 格式。請確認 Google Apps Script 部署『誰有存取權』已設為『所有人』！");
+          throw new Error("Google 未回傳正確 JSON 格式。");
         }
 
         btn.disabled = false;
@@ -522,7 +522,6 @@
       .catch(err => {
         btn.disabled = false;
         btn.innerHTML = '<span>送出並發送日報至本聊天室</span>';
-        alert('❌ API 請求異常！\n詳細原因：' + err.message + '\n\n請檢查：\n1. Google Apps Script 部署『誰有存取權』是否為『所有人』\n2. 執行身分是否為『我』\n3. 部署是否有點選『新部署』建立新版本');
         showToast('❌ API 請求異常: ' + err.message, true);
       });
     };
