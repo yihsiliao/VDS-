@@ -410,28 +410,32 @@
           const summary = res.data;
           const flexMsg = buildLineFlexMessage(summary);
 
-          // ── 修正：加上 liffReady 守衛，避免 liff 未初始化時呼叫 API 崩潰 ──
+          // liffReady 守衛：確認 LIFF 已初始化
           if (!liffReady || typeof liff === 'undefined') {
             showToast('💡 已寫入試算表。請用 liff.line.me 短網址在 LINE 內開啟才能自動推播。');
             return;
           }
+          // 確認在 LINE App 內開啟（sendMessages 只有 isInClient=true 才能用）
           if (!liff.isInClient || !liff.isInClient()) {
-            showToast('💡 已寫入試算表。請在 LINE App 內開啟才能自動發送訊息。');
+            showToast('💡 已寫入試算表。請在 LINE App 內的聊天室連結開啟才能自動發送。');
             return;
           }
-          if (liff.isApiAvailable && !liff.isApiAvailable('sendMessages')) {
-            showToast('⚠️ 此 LIFF 情境不支援 sendMessages（如 Rich Menu），請改從聊天室連結進入。', true);
-            return;
-          }
-          // ─────────────────────────────────────────────────────────────────
-
+          // 直接嘗試發送，錯誤由 .catch 處理
+          // 注意：sendMessages 不用 isApiAvailable 檢查，該 API 不支援此參數
           liff.sendMessages([flexMsg])
             .then(() => {
               showToast('🚀 已自動直接傳送到本聊天室！');
               setTimeout(() => liff.closeWindow(), 1200);
             })
             .catch(err => {
-              showToast('❌ LINE 拒絕發送 (' + (err.code||'') + '): ' + (err.message || JSON.stringify(err)), true);
+              const msg = err.message || JSON.stringify(err);
+              if (msg.includes('403') || msg.includes('Forbidden') || msg.includes('permission')) {
+                showToast('⚠️ 推播失敗：請至 LINE 設定解除連動後重新授權', true);
+              } else if (msg.includes('not in') || msg.includes('context')) {
+                showToast('⚠️ 推播失敗：此連結開啟方式不支援自動發送（如 Rich Menu），請改從聊天室連結進入', true);
+              } else {
+                showToast('❌ LINE 拒絕發送: ' + msg, true);
+              }
             });
         } else {
           showToast('❌ 試算表寫入失敗: ' + (res.error || '未知錯誤'), true);
