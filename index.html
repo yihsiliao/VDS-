@@ -19,7 +19,6 @@
 <body class="p-4 pb-12 max-w-md mx-auto relative min-h-screen">
 
   <script>
-    // ⭐️ 請務必替換為您從 Apps Script 取得的最新 Web App 發布網址
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbylK-y5pJ7jqfKmTzPnC_-V5zHNTbYgun9rkZzlBNM61NMpUdz-UpL_0zd44XHLUnIX/exec";
     const LIFF_ID = "2011118961-2eemCrBc";
   </script>
@@ -210,9 +209,14 @@
     function loadFarms() {
       fetch(GAS_API_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'getFarms' })
       })
-      .then(res => res.json())
+      .then(res => res.text())
+      .then(text => {
+        try { return JSON.parse(text); } 
+        catch(e) { throw new Error("Google 服務未傳回 JSON 格式！請檢查 Apps Script 部署存取權是否設定為『所有人』。"); }
+      })
       .then(onFarmsLoaded)
       .catch(onLoadError);
     }
@@ -412,7 +416,7 @@
       };
     }
 
-    // 表單送出與 LINE 自動推播診斷
+    // 表單送出處理 (強化版防護與診斷)
     document.getElementById('reportForm').onsubmit = function(e) {
       e.preventDefault();
 
@@ -441,10 +445,18 @@
 
       fetch(GAS_API_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(formData)
       })
-      .then(res => res.json())
-      .then(res => {
+      .then(res => res.text())
+      .then(text => {
+        let res;
+        try {
+          res = JSON.parse(text);
+        } catch(e) {
+          throw new Error("Google 未回傳正確 JSON 格式。請確認 Google Apps Script 部署『誰有存取權』是否已設為『所有人』！");
+        }
+
         btn.disabled = false;
         btn.innerHTML = '<span>送出並發送日報至本聊天室</span>';
 
@@ -453,7 +465,6 @@
           const summary = res.data;
           const flexMsg = buildLineFlexMessage(summary);
 
-          // 🔍 精準 LINE 開啟情境診斷
           if (!liff.isInClient()) {
             alert('⚠️ 無法自動推播：因為您點擊的可能不是 LINE 聊天室內的專屬短網址 (liff.line.me)，或者非 LINE 內部開啟！');
             return;
@@ -464,7 +475,6 @@
             return;
           }
 
-          // 發送訊息
           liff.sendMessages([flexMsg])
             .then(() => {
               showToast('🚀 已自動直接傳送到本聊天室！');
@@ -483,7 +493,8 @@
       .catch(err => {
         btn.disabled = false;
         btn.innerHTML = '<span>送出並發送日報至本聊天室</span>';
-        showToast('❌ API 請求異常: ' + err.toString(), true);
+        alert('❌ API 請求異常！\n詳細原因：' + err.message + '\n\n請檢查：\n1. Google Apps Script 部署『誰有存取權』是否為『所有人』\n2. 執行身分是否為『我』\n3. 部署是否有點選『新部署』建立新版本');
+        showToast('❌ API 請求異常: ' + err.message, true);
       });
     };
   </script>
