@@ -193,17 +193,38 @@
 
     document.getElementById('date').value = new Date().toISOString().split('T')[0];
 
+    // 順序控制：LIFF 初始化完成後，才進行 loadFarms()（兼具 3 秒超時備援）
     window.onload = function() {
       renderStaffChips();
+
+      let loaded = false;
+      const farmTimeout = setTimeout(() => {
+        if (!loaded) {
+          loaded = true;
+          console.warn('LIFF 初始化較慢，直接載入農地資料');
+          loadFarms();
+        }
+      }, 3000);
+
       if (typeof liff !== 'undefined' && LIFF_ID) {
         liff.init({ liffId: LIFF_ID })
           .then(() => {
             liffReady = true;
             console.log("LIFF Init success, isInClient:", liff.isInClient());
           })
-          .catch(err => console.warn('LIFF Init error:', err));
+          .catch(err => console.warn('LIFF Init error:', err))
+          .finally(() => {
+            if (!loaded) {
+              loaded = true;
+              clearTimeout(farmTimeout);
+              loadFarms();
+            }
+          });
+      } else {
+        loaded = true;
+        clearTimeout(farmTimeout);
+        loadFarms();
       }
-      loadFarms();
     };
 
     function loadFarms() {
@@ -215,7 +236,7 @@
       .then(res => res.text())
       .then(text => {
         try { return JSON.parse(text); } 
-        catch(e) { throw new Error("Google 服務未傳回 JSON 格式！請檢查 Apps Script 部署存取權是否設定為『所有人』。"); }
+        catch(e) { throw new Error("Google 未回傳 JSON。請確認 Apps Script 部署『誰有存取權』已設為『所有人』！"); }
       })
       .then(onFarmsLoaded)
       .catch(onLoadError);
@@ -249,7 +270,15 @@
       document.getElementById('toastMessage').innerText = message;
       toast.className = `fixed top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-sm p-4 rounded-2xl shadow-2xl text-sm font-medium transition-all duration-300 z-50 flex items-center justify-between ${isError ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white'}`;
       toast.classList.remove('opacity-0', '-translate-y-10', 'pointer-events-none');
-      setTimeout(() => toast.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none'), 3500);
+      setTimeout(() => hideToast(), 3500);
+    }
+
+    // 補齊 hideToast 函式
+    function hideToast() {
+      const toast = document.getElementById('toast');
+      if (toast) {
+        toast.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none');
+      }
     }
 
     function calculateNetHours(startTime, endTime, breakHours) {
@@ -416,7 +445,7 @@
       };
     }
 
-    // 表單送出處理 (強化版防護與診斷)
+    // 表單送出處理
     document.getElementById('reportForm').onsubmit = function(e) {
       e.preventDefault();
 
@@ -454,7 +483,7 @@
         try {
           res = JSON.parse(text);
         } catch(e) {
-          throw new Error("Google 未回傳正確 JSON 格式。請確認 Google Apps Script 部署『誰有存取權』是否已設為『所有人』！");
+          throw new Error("Google 未回傳正確 JSON 格式。請確認 Google Apps Script 部署『誰有存取權』已設為『所有人』！");
         }
 
         btn.disabled = false;
