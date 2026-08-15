@@ -57,7 +57,7 @@
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
       <div class="flex justify-between items-center border-b pb-2 border-slate-100">
         <label class="block text-xs font-bold text-slate-500 uppercase">⏰ 上下班時間與休息時長</label>
-        <span id="netHoursBadge" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">淨工時: 8.0 小時</span>
+        <span id="netHoursBadge" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">工時: 8.0 小時</span>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
@@ -349,7 +349,7 @@
       const workerCount = parseInt(document.getElementById('workerCount').value) || 0;
       const netHours = calculateNetHours(document.getElementById('startTime').value, document.getElementById('endTime').value, document.getElementById('breakHours').value);
 
-      document.getElementById('netHoursBadge').innerText = `淨工時: ${netHours.toFixed(1)} 小時`;
+      document.getElementById('netHoursBadge').innerText = `工時: ${netHours.toFixed(1)} 小時`;
       document.getElementById('overtimeNotice').classList.toggle('hidden', netHours <= 8);
 
       const totalCost = Math.round((supCount * calculateSupervisorDailyCost(netHours)) + (workerCount * calculateWorkerDailyCost(netHours)));
@@ -375,7 +375,7 @@
 
       return `💧【田間水管鋪設日報】\n` +
              `📅 日期：${s.date}\n` +
-             `⏰ 工時：${s.startTime || '08:00'}~${s.endTime || '17:00'} (淨 ${netHours.toFixed(1)} hr${isOt ? ' ‧ 含加班' : ''})\n` +
+             `⏰ 工時：${s.startTime || '08:00'}~${s.endTime || '17:00'} ( ${netHours.toFixed(1)} hr${isOt ? ' ‧ 含加班' : ''})\n` +
              `-------------------------\n` +
              `📏 完工總面積：${totalArea.toFixed(2)} 分地 (${s.farmCount} 塊地)\n` +
              `📍 完工地號：${s.farmIds}\n` +
