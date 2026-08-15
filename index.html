@@ -15,9 +15,7 @@
   </style>
 </head>
 <body class="p-4 pb-12 max-w-md mx-auto relative min-h-screen">
-
   <script>
-    // ⭐️ 請替換為您的 GAS Web App 發布網址
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwDFxPCmTTwU2hbCvjTZcVSw030JJ2Jocr7dxZNI1-9uZYszf-cU5lonDapdgztnRom/exec";
     const LIFF_ID = "2011118961-2eemCrBc";
   </script>
@@ -45,7 +43,6 @@
       <label class="block text-xs font-bold text-slate-500 uppercase mb-1">施工日期</label>
       <input type="date" id="date" name="date" required class="w-full text-lg font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200 focus:outline-none">
     </div>
-
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
       <div class="flex justify-between items-center border-b pb-2 border-slate-100">
         <label class="block text-xs font-bold text-slate-500 uppercase">⏰ 上下班時間與休息時長</label>
@@ -75,7 +72,6 @@
         ⚡ 包含加班工時！第 1-2 小時 (1.34倍) / 第 3-4 小時 (1.67倍)
       </div>
     </div>
-
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
       <div class="flex justify-between items-center">
         <label class="block text-xs font-bold text-slate-500 uppercase">出勤人力與名單點選</label>
@@ -91,24 +87,16 @@
         </div>
         <div id="staffChipContainer" class="flex flex-wrap gap-2"></div>
       </div>
-      
       <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-        <div>
-          <span class="font-bold text-slate-800 block text-sm">👨‍🌾 移工主管</span>
-          <span class="text-xs text-slate-500">日薪 $2,780 元/日</span>
-        </div>
+        <div><span class="font-bold text-slate-800 block text-sm">👨‍🌾 移工主管</span><span class="text-xs text-slate-500">日薪 $2,780 元/日</span></div>
         <div class="flex items-center space-x-3">
           <button type="button" class="stepper-btn" onclick="adjustCount('supervisorCount', -1)">-</button>
           <input type="number" id="supervisorCount" name="supervisorCount" value="1" min="0" readonly class="w-8 text-center text-lg font-bold bg-transparent">
           <button type="button" class="stepper-btn" onclick="adjustCount('supervisorCount', 1)">+</button>
         </div>
       </div>
-
       <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-        <div>
-          <span class="font-bold text-slate-800 block text-sm">👷‍♂️ 移工組員</span>
-          <span class="text-xs text-slate-500">日薪 $2,643 元/日</span>
-        </div>
+        <div><span class="font-bold text-slate-800 block text-sm">👷‍♂️ 移工組員</span><span class="text-xs text-slate-500">日薪 $2,643 元/日</span></div>
         <div class="flex items-center space-x-3">
           <button type="button" class="stepper-btn" onclick="adjustCount('workerCount', -1)">-</button>
           <input type="number" id="workerCount" name="workerCount" value="3" min="0" readonly class="w-8 text-center text-lg font-bold bg-transparent">
@@ -116,7 +104,6 @@
         </div>
       </div>
     </div>
-
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
       <div class="flex items-center justify-between mb-2">
         <label class="text-xs font-bold text-slate-500 uppercase">今日完工農地 (可多選)</label>
@@ -125,11 +112,8 @@
       <input type="text" id="farmSearch" placeholder="🔍 搜尋農地編號、鄉鎮或種植人..." oninput="filterFarms()" class="w-full text-sm p-2.5 mb-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none">
       <div id="farmContainer" class="max-h-56 overflow-y-auto space-y-2 pr-1"></div>
     </div>
-
     <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-lg space-y-3">
-      <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800 pb-1.5 flex justify-between">
-        <span>⚡ 現場即時成本預覽</span>
-      </div>
+      <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800 pb-1.5">⚡ 現場即時成本預覽</div>
       <div class="grid grid-cols-2 gap-3 text-center pt-1 border-b border-slate-800 pb-2">
         <div>
           <div class="text-[11px] text-slate-400 mb-1">今日總人力成本</div>
@@ -151,7 +135,6 @@
         </div>
       </div>
     </div>
-
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2">
       <label class="block text-xs font-bold text-slate-500 uppercase">現場狀況與異常備註</label>
       <select id="note" name="note" onchange="toggleCustomNote()" class="w-full text-sm p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none">
@@ -163,15 +146,13 @@
       </select>
       <input type="text" id="customNote" placeholder="請簡述異常狀況..." class="hidden w-full text-sm p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none">
     </div>
-
-    <button type="submit" id="submitBtn" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-98 transition-all text-base flex items-center justify-center space-x-2">
+    <button type="submit" id="submitBtn" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-98 transition-all text-base flex items-center justify-center">
       <span>送出並發送日報至本聊天室</span>
     </button>
   </form>
 
   <script>
-    let globalFarmList = [];
-    let globalCumulativeAvgCost = 0;
+    let globalFarmList = [], globalCumulativeAvgCost = 0;
     const STAFF_LIST = ['文統', '芳河', '謝練', '文全', '士雄', '波朱', '功維', '成龍'];
     let selectedStaffNames = [];
     const COST_SUPERVISOR = 2780, COST_WORKER = 2643;
@@ -180,88 +161,105 @@
 
     document.getElementById('date').value = new Date().toISOString().split('T')[0];
 
+    // ════════════════════════════════════════════════════════════════════
+    // 修正：liff.init 完成後才呼叫 loadFarms，確保 liffReady 已設定
+    // 原版兩者並行 → liffReady 送出時還是 false → sendMessages 不執行
+    // ════════════════════════════════════════════════════════════════════
     window.onload = function() {
       renderStaffChips();
+
       if (typeof liff !== 'undefined' && LIFF_ID) {
+        var initDone = false;
+
+        // 4 秒逾時保護：init 若卡住仍能繼續
+        var initTimeout = setTimeout(function() {
+          if (!initDone) {
+            initDone = true;
+            console.warn('liff.init 逾時，繼續載入農地');
+            loadFarms();
+          }
+        }, 4000);
+
         liff.init({ liffId: LIFF_ID })
-          .then(() => { liffReady = true; })
-          .catch(err => console.warn('LIFF Init error:', err));
+          .then(function() {
+            liffReady = true;
+            console.log('LIFF 初始化成功, isInClient:', liff.isInClient());
+          })
+          .catch(function(err) {
+            console.warn('LIFF 初始化失敗:', err.message);
+          })
+          .finally(function() {
+            if (!initDone) {
+              initDone = true;
+              clearTimeout(initTimeout);
+              loadFarms();
+            }
+          });
+      } else {
+        loadFarms();
       }
-      loadFarms();
     };
 
+    // 修正：用 fetch 打 GAS API，回傳格式需符合 { success, data, cumulativeStats }
     function loadFarms() {
       fetch(GAS_API_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'getFarms' })
       })
-      .then(res => res.json())
+      .then(function(res) { return res.json(); })
       .then(onFarmsLoaded)
       .catch(onLoadError);
     }
 
+    function hideToast() {  // 修正：原版缺少此函式
+      document.getElementById('toast').classList.add('opacity-0', '-translate-y-10', 'pointer-events-none');
+    }
+    function showToast(message, isError) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').innerText = message;
+      toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-sm p-4 rounded-2xl shadow-2xl text-sm font-medium transition-all duration-300 z-50 flex items-center justify-between ' + (isError ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white');
+      toast.classList.remove('opacity-0', '-translate-y-10', 'pointer-events-none');
+      setTimeout(hideToast, 3500);
+    }
     function renderStaffChips() {
       const container = document.getElementById('staffChipContainer');
       container.innerHTML = '';
-      STAFF_LIST.forEach(name => {
+      STAFF_LIST.forEach(function(name) {
         const isSelected = selectedStaffNames.includes(name);
         const chip = document.createElement('div');
-        chip.className = `staff-chip px-3 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer ${isSelected ? 'active' : 'bg-slate-50 text-slate-700 border-slate-200'}`;
-        chip.innerHTML = `<span>${isSelected ? '✓ ' : ''}${name}</span>`;
-        chip.onclick = () => {
-          if (selectedStaffNames.includes(name)) selectedStaffNames = selectedStaffNames.filter(n => n !== name);
+        chip.className = 'staff-chip px-3 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer ' + (isSelected ? 'active' : 'bg-slate-50 text-slate-700 border-slate-200');
+        chip.innerHTML = '<span>' + (isSelected ? '✓ ' : '') + name + '</span>';
+        chip.onclick = function() {
+          if (selectedStaffNames.includes(name)) selectedStaffNames = selectedStaffNames.filter(function(n) { return n !== name; });
           else selectedStaffNames.push(name);
           renderStaffChips();
         };
         container.appendChild(chip);
       });
-      document.getElementById('selectedStaffBadge').innerText = `已點選 ${selectedStaffNames.length} 人`;
+      document.getElementById('selectedStaffBadge').innerText = '已點選 ' + selectedStaffNames.length + ' 人';
     }
-
-    function selectAllStaff(selectAll) {
-      selectedStaffNames = selectAll ? [...STAFF_LIST] : [];
-      renderStaffChips();
-    }
-
-    function showToast(message, isError = false) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMessage').innerText = message;
-      toast.className = `fixed top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-sm p-4 rounded-2xl shadow-2xl text-sm font-medium transition-all duration-300 z-50 flex items-center justify-between ${isError ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white'}`;
-      toast.classList.remove('opacity-0', '-translate-y-10', 'pointer-events-none');
-      setTimeout(() => toast.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none'), 3500);
-    }
-
-    function calculateNetHours(startTime, endTime, breakHours) {
-      if (!startTime || !endTime) return 8.0;
-      const sP = startTime.split(':').map(Number), eP = endTime.split(':').map(Number);
-      let raw = (eP[0] + eP[1] / 60) - (sP[0] + sP[1] / 60);
+    function selectAllStaff(all) { selectedStaffNames = all ? STAFF_LIST.slice() : []; renderStaffChips(); }
+    function calculateNetHours(s, e, b) {
+      if (!s || !e) return 8.0;
+      var sP = s.split(':').map(Number), eP = e.split(':').map(Number);
+      var raw = (eP[0] + eP[1]/60) - (sP[0] + sP[1]/60);
       if (raw < 0) raw += 24;
-      return Math.max(0, raw - parseFloat(breakHours || 0));
+      return Math.max(0, raw - parseFloat(b || 0));
     }
-
-    function calculateSupervisorDailyCost(netHours) {
-      if (netHours <= 8) return COST_SUPERVISOR;
-      const ot1 = Math.min(Math.max(0, netHours - 8), 2), ot2 = Math.min(Math.max(0, netHours - 10), 2);
-      return COST_SUPERVISOR + (ot1 * OT_HOURLY_SUPERVISOR * 1.34) + (ot2 * OT_HOURLY_SUPERVISOR * 1.67);
+    function calcDailyCost(base, otRate, h) {
+      if (h <= 8) return base;
+      var ot1 = Math.min(Math.max(0, h-8), 2), ot2 = Math.min(Math.max(0, h-10), 2);
+      return base + ot1*otRate*1.34 + ot2*otRate*1.67;
     }
-
-    function calculateWorkerDailyCost(netHours) {
-      if (netHours <= 8) return COST_WORKER;
-      const ot1 = Math.min(Math.max(0, netHours - 8), 2), ot2 = Math.min(Math.max(0, netHours - 10), 2);
-      return COST_WORKER + (ot1 * OT_HOURLY_WORKER * 1.34) + (ot2 * OT_HOURLY_WORKER * 1.67);
-    }
-
     function adjustCount(id, delta) {
-      const input = document.getElementById(id);
-      input.value = Math.max(0, parseInt(input.value) + delta);
+      var el = document.getElementById(id);
+      el.value = Math.max(0, parseInt(el.value) + delta);
       updatePreview();
     }
-
     function toggleCustomNote() {
-      const select = document.getElementById('note');
-      document.getElementById('customNote').classList.toggle('hidden', select.value !== '其他');
+      document.getElementById('customNote').classList.toggle('hidden', document.getElementById('note').value !== '其他');
     }
-
     function onFarmsLoaded(response) {
       document.getElementById('loading').classList.add('hidden');
       if (response && response.success && Array.isArray(response.data)) {
@@ -271,137 +269,98 @@
         document.getElementById('reportForm').classList.remove('hidden');
         updatePreview();
       } else {
-        showToast('無法讀取農地清單', true);
+        showToast('無法讀取農地清單：' + (response && response.error ? response.error : '請確認 GAS 部署'), true);
+        document.getElementById('loading').innerHTML = '<div class="text-rose-500 p-2"><p class="font-bold text-sm">⚠️ 農地資料讀取失敗</p><p class="text-xs text-slate-500 mt-1">請確認 GAS 部署設定</p></div>';
       }
     }
-
     function onLoadError(err) {
-      document.getElementById('loading').innerHTML = `<div class="text-rose-500 p-2"><p class="font-bold text-sm">⚠️ 資料載入失敗</p></div>`;
+      document.getElementById('loading').innerHTML = '<div class="text-rose-500 p-2"><p class="font-bold text-sm">⚠️ 連線失敗</p><p class="text-xs text-slate-500 mt-1">請確認網路與 GAS 部署網址</p></div>';
+      console.error('loadFarms error:', err);
     }
-
     function renderFarmList(farms) {
-      const container = document.getElementById('farmContainer');
-      container.innerHTML = farms.map(farm => `
-        <label class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-100 cursor-pointer">
-          <div class="flex items-center space-x-3 w-full">
-            <input type="checkbox" name="selectedFarms" value="${farm.id}" data-area="${farm.area}" onchange="updatePreview()" class="w-5 h-5 text-slate-900 rounded border-slate-300">
-            <span class="text-sm font-semibold text-slate-800 break-all">${farm.displayText}</span>
-          </div>
-        </label>
-      `).join('');
+      var container = document.getElementById('farmContainer');
+      if (!farms || farms.length === 0) { container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">查無農地資料</p>'; return; }
+      container.innerHTML = farms.map(function(farm) {
+        return '<label class="flex items-center p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-100 cursor-pointer"><div class="flex items-center space-x-3 w-full"><input type="checkbox" name="selectedFarms" value="' + farm.id + '" data-area="' + farm.area + '" onchange="updatePreview()" class="w-5 h-5 rounded border-slate-300 accent-slate-900"><span class="text-sm font-semibold text-slate-800 break-all">' + farm.displayText + '</span></div></label>';
+      }).join('');
     }
-
     function filterFarms() {
-      const keyword = document.getElementById('farmSearch').value.toLowerCase().trim();
-      renderFarmList(globalFarmList.filter(f => f.displayText.toLowerCase().includes(keyword)));
+      var kw = document.getElementById('farmSearch').value.toLowerCase().trim();
+      renderFarmList(globalFarmList.filter(function(f) { return f.displayText.toLowerCase().includes(kw); }));
     }
-
     function updatePreview() {
-      const supCount = parseInt(document.getElementById('supervisorCount').value) || 0;
-      const workerCount = parseInt(document.getElementById('workerCount').value) || 0;
-      const netHours = calculateNetHours(document.getElementById('startTime').value, document.getElementById('endTime').value, document.getElementById('breakHours').value);
-
-      document.getElementById('netHoursBadge').innerText = `淨工時: ${netHours.toFixed(1)} 小時`;
+      var supCount = parseInt(document.getElementById('supervisorCount').value) || 0;
+      var workerCount = parseInt(document.getElementById('workerCount').value) || 0;
+      var netHours = calculateNetHours(document.getElementById('startTime').value, document.getElementById('endTime').value, document.getElementById('breakHours').value);
+      document.getElementById('netHoursBadge').innerText = '淨工時: ' + netHours.toFixed(1) + ' 小時';
       document.getElementById('overtimeNotice').classList.toggle('hidden', netHours <= 8);
-
-      const totalCost = Math.round((supCount * calculateSupervisorDailyCost(netHours)) + (workerCount * calculateWorkerDailyCost(netHours)));
-      const checkedBoxes = document.querySelectorAll('input[name="selectedFarms"]:checked');
-      let totalArea = 0;
-      checkedBoxes.forEach(cb => { totalArea += parseFloat(cb.getAttribute('data-area')) || 0; });
-
-      document.getElementById('selectedCount').innerText = `已選 ${checkedBoxes.length} 塊地`;
-      document.getElementById('previewCost').innerText = `$${totalCost.toLocaleString()}`;
-      document.getElementById('previewArea').innerText = `${totalArea.toFixed(2)} 分`;
-      document.getElementById('previewUnitCost').innerText = `$${totalArea > 0 ? Math.round(totalCost / totalArea).toLocaleString() : 0} /分`;
-      document.getElementById('previewCumulativeAvgCost').innerText = `$${globalCumulativeAvgCost.toLocaleString()} /分`;
+      var totalCost = Math.round(supCount * calcDailyCost(COST_SUPERVISOR, OT_HOURLY_SUPERVISOR, netHours) + workerCount * calcDailyCost(COST_WORKER, OT_HOURLY_WORKER, netHours));
+      var checked = document.querySelectorAll('input[name="selectedFarms"]:checked');
+      var totalArea = 0;
+      checked.forEach(function(cb) { totalArea += parseFloat(cb.getAttribute('data-area')) || 0; });
+      document.getElementById('selectedCount').innerText = '已選 ' + checked.length + ' 塊地';
+      document.getElementById('previewCost').innerText = '$' + totalCost.toLocaleString();
+      document.getElementById('previewArea').innerText = totalArea.toFixed(2) + ' 分';
+      document.getElementById('previewUnitCost').innerText = '$' + (totalArea > 0 ? Math.round(totalCost/totalArea).toLocaleString() : '0') + ' /分';
+      document.getElementById('previewCumulativeAvgCost').innerText = '$' + globalCumulativeAvgCost.toLocaleString() + ' /分';
     }
-
-    function buildLineFlexMessage(summary) {
-      const netHours = parseFloat(summary.netHours || 8.0);
-      const isOt = netHours > 8;
-      const unitCost = Number(summary.unitCost) || 0;
-      const cumAvgCost = Number(summary.cumAvgCost) || 0;
-      const isCheaper = (unitCost - cumAvgCost) <= 0;
-      const totalArea = parseFloat(summary.totalArea) || 0;
-
+    function buildLineFlexMessage(s) {
+      var netHours = parseFloat(s.netHours || 8.0);
+      var unitCost = Number(s.unitCost) || 0;
+      var cumAvgCost = Number(s.cumAvgCost) || 0;
+      var isCheaper = unitCost <= cumAvgCost;
+      var totalArea = parseFloat(s.totalArea) || 0;
       return {
         type: "flex",
-        altText: `💧 田間水管鋪設日報 (${summary.date}) - 完工 ${totalArea.toFixed(2)} 分地`,
+        altText: "💧 田間水管鋪設日報 (" + s.date + ") - 完工 " + totalArea.toFixed(2) + " 分地",
         contents: {
           type: "bubble", size: "mega",
-          header: {
-            type: "box", layout: "vertical", backgroundColor: "#0f172a", paddingAll: "20px",
-            contents: [
-              {
-                type: "box", layout: "horizontal",
-                contents: [
-                  { type: "text", text: "💧 田間水管鋪設日報", weight: "bold", color: "#ffffff", size: "lg", flex: 1 },
-                  { type: "text", text: summary.date, color: "#94a3b8", size: "xs", align: "end", gravity: "center" }
-                ]
-              },
-              { type: "text", text: `⏰ 工時: ${summary.startTime||'08:00'}~${summary.endTime||'17:00'} (淨 ${netHours.toFixed(1)} hr${isOt ? ' ‧ 含加班' : ''})`, color: "#94a3b8", size: "xxs", marginTop: "4px" }
-            ]
-          },
-          body: {
-            type: "box", layout: "vertical", paddingAll: "20px", spacing: "md",
-            contents: [
-              {
-                type: "box", layout: "horizontal", backgroundColor: "#f8fafc", cornerRadius: "12px", paddingAll: "14px",
-                contents: [
-                  {
-                    type: "box", layout: "vertical", align: "center", flex: 1,
-                    contents: [
-                      { type: "text", text: "今日完工面積", size: "xxs", color: "#64748b" },
-                      { type: "text", text: totalArea.toFixed(2), size: "xl", weight: "bold", color: "#10b981", marginTop: "2px" },
-                      { type: "text", text: "分地", size: "xxs", color: "#10b981" }
-                    ]
-                  },
-                  { type: "separator", color: "#e2e8f0" },
-                  {
-                    type: "box", layout: "vertical", align: "center", flex: 1,
-                    contents: [
-                      { type: "text", text: "今日單位成本", size: "xxs", color: "#64748b" },
-                      { type: "text", text: `$${Math.round(unitCost).toLocaleString()}`, size: "xl", weight: "bold", color: "#0284c7", marginTop: "2px" },
-                      { type: "text", text: "元/分", size: "xxs", color: "#0284c7" }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: "box", layout: "horizontal", backgroundColor: isCheaper ? "#f0fdf4" : "#fef2f2", cornerRadius: "8px", paddingAll: "8px",
-                contents: [{ type: "text", text: `📊 全場歷史累積平均成本：$${Math.round(cumAvgCost).toLocaleString()} 元/分 (${isCheaper ? '🟢 低於平均' : '🔴 高於平均'})`, size: "xxs", color: isCheaper ? "#166534" : "#991b1b", align: "center", flex: 1 }]
-              },
-              {
-                type: "box", layout: "vertical", margin: "md", spacing: "sm",
-                contents: [
-                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "📍 完工地號", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: `${summary.farmIds} (${summary.farmCount}塊地)`, color: "#0f172a", size: "xs", weight: "bold", flex: 4, align: "end", wrap: true }] },
-                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "👥 出勤人力", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: `主管 ${summary.supervisorCount} 人 / 組員 ${summary.workerCount} 人`, color: "#0f172a", size: "xs", weight: "bold", flex: 4, align: "end" }] },
-                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "🏷️ 出勤人員", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: summary.staffNames || '無', color: "#334155", size: "xs", flex: 4, align: "end", wrap: true }] },
-                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "💰 今日總成本", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: `$${Number(summary.totalCost).toLocaleString()} 元`, color: "#d97706", size: "xs", weight: "bold", flex: 4, align: "end" }] },
-                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "📝 現場備註", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: summary.note || '無', color: "#334155", size: "xs", flex: 4, align: "end", wrap: true }] }
-                ]
-              }
-            ]
-          },
-          footer: {
-            type: "box", layout: "vertical", backgroundColor: "#f8fafc", paddingAll: "12px",
-            contents: [{ type: "text", text: "✅ 數據已自動同步寫入施工紀錄試算表", size: "xxs", color: "#94a3b8", align: "center" }]
-          }
+          header: { type: "box", layout: "vertical", backgroundColor: "#0f172a", paddingAll: "20px", contents: [
+            { type: "box", layout: "horizontal", contents: [
+              { type: "text", text: "💧 田間水管鋪設日報", weight: "bold", color: "#ffffff", size: "lg", flex: 1 },
+              { type: "text", text: s.date, color: "#94a3b8", size: "xs", align: "end", gravity: "center" }
+            ]},
+            { type: "text", text: "⏰ 工時: " + (s.startTime||'08:00') + "~" + (s.endTime||'17:00') + " (淨 " + netHours.toFixed(1) + " hr" + (netHours>8 ? " ‧ 含加班":"") + ")", color: "#94a3b8", size: "xxs", marginTop: "4px" }
+          ]},
+          body: { type: "box", layout: "vertical", paddingAll: "20px", spacing: "md", contents: [
+            { type: "box", layout: "horizontal", backgroundColor: "#f8fafc", cornerRadius: "12px", paddingAll: "14px", contents: [
+              { type: "box", layout: "vertical", align: "center", flex: 1, contents: [
+                { type: "text", text: "今日完工面積", size: "xxs", color: "#64748b" },
+                { type: "text", text: totalArea.toFixed(2), size: "xl", weight: "bold", color: "#10b981", marginTop: "2px" },
+                { type: "text", text: "分地", size: "xxs", color: "#10b981" }
+              ]},
+              { type: "separator", color: "#e2e8f0" },
+              { type: "box", layout: "vertical", align: "center", flex: 1, contents: [
+                { type: "text", text: "今日單位成本", size: "xxs", color: "#64748b" },
+                { type: "text", text: "$" + Math.round(unitCost).toLocaleString(), size: "xl", weight: "bold", color: "#0284c7", marginTop: "2px" },
+                { type: "text", text: "元/分", size: "xxs", color: "#0284c7" }
+              ]}
+            ]},
+            { type: "box", layout: "horizontal", backgroundColor: isCheaper ? "#f0fdf4":"#fef2f2", cornerRadius: "8px", paddingAll: "8px", contents: [
+              { type: "text", text: "📊 全場歷史累積平均成本：$" + Math.round(cumAvgCost).toLocaleString() + " 元/分 (" + (isCheaper?"🟢 低於平均":"🔴 高於平均") + ")", size: "xxs", color: isCheaper?"#166534":"#991b1b", align: "center", flex: 1 }
+            ]},
+            { type: "box", layout: "vertical", margin: "md", spacing: "sm", contents: [
+              { type: "box", layout: "horizontal", contents: [{ type: "text", text: "📍 完工地號", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: s.farmIds + " (" + s.farmCount + "塊地)", color: "#0f172a", size: "xs", weight: "bold", flex: 4, align: "end", wrap: true }]},
+              { type: "box", layout: "horizontal", contents: [{ type: "text", text: "👥 出勤人力", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: "主管 " + s.supervisorCount + " 人 / 組員 " + s.workerCount + " 人", color: "#0f172a", size: "xs", weight: "bold", flex: 4, align: "end" }]},
+              { type: "box", layout: "horizontal", contents: [{ type: "text", text: "🏷️ 出勤人員", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: s.staffNames || "無", color: "#334155", size: "xs", flex: 4, align: "end", wrap: true }]},
+              { type: "box", layout: "horizontal", contents: [{ type: "text", text: "💰 今日總成本", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: "$" + Number(s.totalCost).toLocaleString() + " 元", color: "#d97706", size: "xs", weight: "bold", flex: 4, align: "end" }]},
+              { type: "box", layout: "horizontal", contents: [{ type: "text", text: "📝 現場備註", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: s.note || "無", color: "#334155", size: "xs", flex: 4, align: "end", wrap: true }]}
+            ]}
+          ]},
+          footer: { type: "box", layout: "vertical", backgroundColor: "#f8fafc", paddingAll: "12px", contents: [
+            { type: "text", text: "✅ 數據已自動同步寫入施工紀錄試算表", size: "xxs", color: "#94a3b8", align: "center" }
+          ]}
         }
       };
     }
 
     document.getElementById('reportForm').onsubmit = function(e) {
       e.preventDefault();
+      var checked = document.querySelectorAll('input[name="selectedFarms"]:checked');
+      if (checked.length === 0) { showToast('⚠️ 請至少勾選一塊施工農地！', true); return; }
 
-      const checkedBoxes = document.querySelectorAll('input[name="selectedFarms"]:checked');
-      if (checkedBoxes.length === 0) {
-        showToast('⚠️ 請至少勾選一塊施工農地！', true);
-        return;
-      }
-
-      const noteSelect = document.getElementById('note').value;
-      const formData = {
+      var noteVal = document.getElementById('note').value;
+      var formData = {
         date: document.getElementById('date').value,
         startTime: document.getElementById('startTime').value,
         endTime: document.getElementById('endTime').value,
@@ -409,46 +368,44 @@
         supervisorCount: document.getElementById('supervisorCount').value,
         workerCount: document.getElementById('workerCount').value,
         staffNames: selectedStaffNames.join(', '),
-        farmIds: Array.from(checkedBoxes).map(cb => cb.value).join(', '),
-        note: noteSelect === '其他' ? document.getElementById('customNote').value : noteSelect
+        farmIds: Array.from(checked).map(function(cb) { return cb.value; }).join(', '),
+        note: noteVal === '其他' ? document.getElementById('customNote').value : noteVal
       };
 
-      const btn = document.getElementById('submitBtn');
+      var btn = document.getElementById('submitBtn');
       btn.disabled = true;
       btn.innerHTML = '<span>⏳ 資料寫入中...</span>';
 
       fetch(GAS_API_URL, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
-      .then(res => res.json())
-      .then(res => {
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
         btn.disabled = false;
         btn.innerHTML = '<span>送出並發送日報至本聊天室</span>';
-
         if (res && res.success) {
           showToast('✅ 成功寫入試算表！');
-          const summary = res.data;
-          const flexMsg = buildLineFlexMessage(summary);
-
-          // 核心推播發送
-          if (liffReady && liff.isInClient && liff.isInClient()) {
+          var summary = res.data;
+          var flexMsg = buildLineFlexMessage(summary);
+          if (liffReady && typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) {
             liff.sendMessages([flexMsg])
-              .then(() => {
-                showToast('🚀 已自動直接傳送到本聊天室！');
-                setTimeout(() => liff.closeWindow(), 1000);
+              .then(function() {
+                showToast('🚀 日報卡片已直接傳送到本聊天室！');
+                setTimeout(function() { liff.closeWindow(); }, 1200);
               })
-              .catch(err => {
-                showToast('⚠️ 自動推播失敗: ' + err.message, true);
+              .catch(function(err) {
+                showToast('⚠️ 自動推播失敗: ' + err.message + '（請確認 chat_message.write 已開啟）', true);
               });
           } else {
-            showToast('💡 成功寫入！目前非 LIFF 環境');
+            showToast('💡 已寫入試算表。請使用 liff.line.me 短網址開啟才能自動推播。');
           }
         } else {
-          showToast('❌ 寫入失敗', true);
+          showToast('❌ 寫入失敗：' + (res && res.error ? res.error : '請重試'), true);
         }
       })
-      .catch(err => {
+      .catch(function(err) {
         btn.disabled = false;
         btn.innerHTML = '<span>送出並發送日報至本聊天室</span>';
         showToast('❌ 請求異常: ' + err.toString(), true);
