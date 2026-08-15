@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>田間水管鋪設施工日報</title>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; touch-action: manipulation; }
+    .stepper-btn { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 20px; font-weight: bold; background-color: #f1f5f9; color: #0f172a; transition: all 0.15s ease; }
+    .stepper-btn:active { background-color: #cbd5e1; transform: scale(0.95); }
+    .staff-chip { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
+    .staff-chip.active { background-color: #0f172a; color: #ffffff; border-color: #0f172a; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); }
+  </style>
+</head>
+<body class="p-4 pb-12 max-w-md mx-auto relative min-h-screen">
+
+  <script>
+    // ⭐️ 請替換為您的 GAS Web App 發布網址
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwDFxPCmTTwU2hbCvjTZcVSw030JJ2Jocr7dxZNI1-9uZYszf-cU5lonDapdgztnRom/exec";
+    const LIFF_ID = "2011118961-2eemCrBc";
+  </script>
+
+  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-sm p-4 rounded-2xl shadow-2xl bg-slate-900 text-white text-sm font-medium transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none z-50 flex items-center justify-between">
+    <span id="toastMessage">系統訊息</span>
+    <button type="button" onclick="hideToast()" class="ml-2 text-slate-400 hover:text-white font-bold text-lg">&times;</button>
+  </div>
+
+  <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md mb-4 text-center relative overflow-hidden">
+    <div class="flex items-center justify-center space-x-2">
+      <span class="text-xl">💧</span>
+      <h1 class="text-xl font-bold tracking-wide">田間水管鋪設日報</h1>
+    </div>
+    <p class="text-xs text-slate-400 mt-1">GitHub 託管 ‧ 自動推播與成本試算</p>
+  </div>
+
+  <div id="loading" class="bg-white p-8 rounded-2xl shadow-sm text-center my-6 border border-slate-100">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-900 border-t-transparent mb-3"></div>
+    <p class="text-sm text-slate-700 font-bold">讀取農地與歷史累積數據...</p>
+  </div>
+
+  <form id="reportForm" class="hidden space-y-4">
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+      <label class="block text-xs font-bold text-slate-500 uppercase mb-1">施工日期</label>
+      <input type="date" id="date" name="date" required class="w-full text-lg font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200 focus:outline-none">
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+      <div class="flex justify-between items-center border-b pb-2 border-slate-100">
+        <label class="block text-xs font-bold text-slate-500 uppercase">⏰ 上下班時間與休息時長</label>
+        <span id="netHoursBadge" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">淨工時: 8.0 小時</span>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 mb-1">上班時間</label>
+          <input type="time" id="startTime" name="startTime" value="08:00" onchange="updatePreview()" class="w-full text-sm font-bold text-slate-800 bg-slate-50 p-2 rounded-xl border border-slate-200 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 mb-1">下班時間</label>
+          <input type="time" id="endTime" name="endTime" value="17:00" onchange="updatePreview()" class="w-full text-sm font-bold text-slate-800 bg-slate-50 p-2 rounded-xl border border-slate-200 focus:outline-none">
+        </div>
+      </div>
+      <div class="flex items-center justify-between pt-1">
+        <label class="text-xs font-medium text-slate-600">中場休息時間：</label>
+        <select id="breakHours" name="breakHours" onchange="updatePreview()" class="text-xs font-bold bg-slate-50 p-2 rounded-xl border border-slate-200 focus:outline-none">
+          <option value="0">無休息 (0hr)</option>
+          <option value="0.5">30 分鐘 (0.5hr)</option>
+          <option value="1.0" selected>1 小時 (1.0hr)</option>
+          <option value="1.5">1.5 小時 (1.5hr)</option>
+          <option value="2.0">2 小時 (2.0hr)</option>
+        </select>
+      </div>
+      <div id="overtimeNotice" class="hidden text-[11px] text-amber-700 bg-amber-50 p-2 rounded-xl border border-amber-200">
+        ⚡ 包含加班工時！第 1-2 小時 (1.34倍) / 第 3-4 小時 (1.67倍)
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+      <div class="flex justify-between items-center">
+        <label class="block text-xs font-bold text-slate-500 uppercase">出勤人力與名單點選</label>
+        <span id="selectedStaffBadge" class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">已點選 0 人</span>
+      </div>
+      <div class="pt-1 pb-2 border-b border-slate-100">
+        <div class="text-[11px] text-slate-400 font-medium mb-2 flex items-center justify-between">
+          <span>👥 今日出勤名單：</span>
+          <div class="space-x-1">
+            <button type="button" onclick="selectAllStaff(true)" class="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded">全選</button>
+            <button type="button" onclick="selectAllStaff(false)" class="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded">清除</button>
+          </div>
+        </div>
+        <div id="staffChipContainer" class="flex flex-wrap gap-2"></div>
+      </div>
+      
+      <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+        <div>
+          <span class="font-bold text-slate-800 block text-sm">👨‍🌾 移工主管</span>
+          <span class="text-xs text-slate-500">日薪 $2,780 元/日</span>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button type="button" class="stepper-btn" onclick="adjustCount('supervisorCount', -1)">-</button>
+          <input type="number" id="supervisorCount" name="supervisorCount" value="1" min="0" readonly class="w-8 text-center text-lg font-bold bg-transparent">
+          <button type="button" class="stepper-btn" onclick="adjustCount('supervisorCount', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+        <div>
+          <span class="font-bold text-slate-800 block text-sm">👷‍♂️ 移工組員</span>
+          <span class="text-xs text-slate-500">日薪 $2,643 元/日</span>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button type="button" class="stepper-btn" onclick="adjustCount('workerCount', -1)">-</button>
+          <input type="number" id="workerCount" name="workerCount" value="3" min="0" readonly class="w-8 text-center text-lg font-bold bg-transparent">
+          <button type="button" class="stepper-btn" onclick="adjustCount('workerCount', 1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-xs font-bold text-slate-500 uppercase">今日完工農地 (可多選)</label>
+        <span id="selectedCount" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">已選 0 塊地</span>
+      </div>
+      <input type="text" id="farmSearch" placeholder="🔍 搜尋農地編號、鄉鎮或種植人..." oninput="filterFarms()" class="w-full text-sm p-2.5 mb-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none">
+      <div id="farmContainer" class="max-h-56 overflow-y-auto space-y-2 pr-1"></div>
+    </div>
+
+    <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-lg space-y-3">
+      <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800 pb-1.5 flex justify-between">
+        <span>⚡ 現場即時成本預覽</span>
+      </div>
+      <div class="grid grid-cols-2 gap-3 text-center pt-1 border-b border-slate-800 pb-2">
+        <div>
+          <div class="text-[11px] text-slate-400 mb-1">今日總人力成本</div>
+          <div id="previewCost" class="text-lg font-bold text-amber-400">$10,709</div>
+        </div>
+        <div>
+          <div class="text-[11px] text-slate-400 mb-1">勾選完工總面積</div>
+          <div id="previewArea" class="text-lg font-bold text-emerald-400">0.00 分</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-center pt-1">
+        <div class="bg-slate-800/60 p-2 rounded-xl">
+          <div class="text-[10px] text-slate-400">今日估計單位成本</div>
+          <div id="previewUnitCost" class="text-base font-bold text-sky-400">$0 /分</div>
+        </div>
+        <div class="bg-slate-800/60 p-2 rounded-xl">
+          <div class="text-[10px] text-slate-400">歷史累積平均成本</div>
+          <div id="previewCumulativeAvgCost" class="text-base font-bold text-indigo-300">$0 /分</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2">
+      <label class="block text-xs font-bold text-slate-500 uppercase">現場狀況與異常備註</label>
+      <select id="note" name="note" onchange="toggleCustomNote()" class="w-full text-sm p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none">
+        <option value="施工正常">🟢 施工正常</option>
+        <option value="地形硬石多，施工較慢">⚠️ 地形硬石多，施工較慢</option>
+        <option value="遇雨暫停施工">🌧️ 遇雨暫停施工</option>
+        <option value="跨區搬運材料耗時">🚛 跨區搬運材料耗時</option>
+        <option value="其他">📝 其他 (自訂填寫)</option>
+      </select>
+      <input type="text" id="customNote" placeholder="請簡述異常狀況..." class="hidden w-full text-sm p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none">
+    </div>
+
+    <button type="submit" id="submitBtn" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-98 transition-all text-base flex items-center justify-center space-x-2">
+      <span>送出並發送日報至本聊天室</span>
+    </button>
+  </form>
+
+  <script>
+    let globalFarmList = [];
+    let globalCumulativeAvgCost = 0;
+    const STAFF_LIST = ['文統', '芳河', '謝練', '文全', '士雄', '波朱', '功維', '成龍'];
+    let selectedStaffNames = [];
+    const COST_SUPERVISOR = 2780, COST_WORKER = 2643;
+    const OT_HOURLY_SUPERVISOR = 139.5, OT_HOURLY_WORKER = 127;
+    let liffReady = false;
+
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+    window.onload = function() {
+      renderStaffChips();
+      if (typeof liff !== 'undefined' && LIFF_ID) {
+        liff.init({ liffId: LIFF_ID })
+          .then(() => { liffReady = true; })
+          .catch(err => console.warn('LIFF Init error:', err));
+      }
+      loadFarms();
+    };
+
+    function loadFarms() {
+      fetch(GAS_API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'getFarms' })
+      })
+      .then(res => res.json())
+      .then(onFarmsLoaded)
+      .catch(onLoadError);
+    }
+
+    function renderStaffChips() {
+      const container = document.getElementById('staffChipContainer');
+      container.innerHTML = '';
+      STAFF_LIST.forEach(name => {
+        const isSelected = selectedStaffNames.includes(name);
+        const chip = document.createElement('div');
+        chip.className = `staff-chip px-3 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer ${isSelected ? 'active' : 'bg-slate-50 text-slate-700 border-slate-200'}`;
+        chip.innerHTML = `<span>${isSelected ? '✓ ' : ''}${name}</span>`;
+        chip.onclick = () => {
+          if (selectedStaffNames.includes(name)) selectedStaffNames = selectedStaffNames.filter(n => n !== name);
+          else selectedStaffNames.push(name);
+          renderStaffChips();
+        };
+        container.appendChild(chip);
+      });
+      document.getElementById('selectedStaffBadge').innerText = `已點選 ${selectedStaffNames.length} 人`;
+    }
+
+    function selectAllStaff(selectAll) {
+      selectedStaffNames = selectAll ? [...STAFF_LIST] : [];
+      renderStaffChips();
+    }
+
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').innerText = message;
+      toast.className = `fixed top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-sm p-4 rounded-2xl shadow-2xl text-sm font-medium transition-all duration-300 z-50 flex items-center justify-between ${isError ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white'}`;
+      toast.classList.remove('opacity-0', '-translate-y-10', 'pointer-events-none');
+      setTimeout(() => toast.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none'), 3500);
+    }
+
+    function calculateNetHours(startTime, endTime, breakHours) {
+      if (!startTime || !endTime) return 8.0;
+      const sP = startTime.split(':').map(Number), eP = endTime.split(':').map(Number);
+      let raw = (eP[0] + eP[1] / 60) - (sP[0] + sP[1] / 60);
+      if (raw < 0) raw += 24;
+      return Math.max(0, raw - parseFloat(breakHours || 0));
+    }
+
+    function calculateSupervisorDailyCost(netHours) {
+      if (netHours <= 8) return COST_SUPERVISOR;
+      const ot1 = Math.min(Math.max(0, netHours - 8), 2), ot2 = Math.min(Math.max(0, netHours - 10), 2);
+      return COST_SUPERVISOR + (ot1 * OT_HOURLY_SUPERVISOR * 1.34) + (ot2 * OT_HOURLY_SUPERVISOR * 1.67);
+    }
+
+    function calculateWorkerDailyCost(netHours) {
+      if (netHours <= 8) return COST_WORKER;
+      const ot1 = Math.min(Math.max(0, netHours - 8), 2), ot2 = Math.min(Math.max(0, netHours - 10), 2);
+      return COST_WORKER + (ot1 * OT_HOURLY_WORKER * 1.34) + (ot2 * OT_HOURLY_WORKER * 1.67);
+    }
+
+    function adjustCount(id, delta) {
+      const input = document.getElementById(id);
+      input.value = Math.max(0, parseInt(input.value) + delta);
+      updatePreview();
+    }
+
+    function toggleCustomNote() {
+      const select = document.getElementById('note');
+      document.getElementById('customNote').classList.toggle('hidden', select.value !== '其他');
+    }
+
+    function onFarmsLoaded(response) {
+      document.getElementById('loading').classList.add('hidden');
+      if (response && response.success && Array.isArray(response.data)) {
+        globalFarmList = response.data;
+        if (response.cumulativeStats) globalCumulativeAvgCost = Math.round(response.cumulativeStats.avgCostPerFen || 0);
+        renderFarmList(globalFarmList);
+        document.getElementById('reportForm').classList.remove('hidden');
+        updatePreview();
+      } else {
+        showToast('無法讀取農地清單', true);
+      }
+    }
+
+    function onLoadError(err) {
+      document.getElementById('loading').innerHTML = `<div class="text-rose-500 p-2"><p class="font-bold text-sm">⚠️ 資料載入失敗</p></div>`;
+    }
+
+    function renderFarmList(farms) {
+      const container = document.getElementById('farmContainer');
+      container.innerHTML = farms.map(farm => `
+        <label class="flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-100 cursor-pointer">
+          <div class="flex items-center space-x-3 w-full">
+            <input type="checkbox" name="selectedFarms" value="${farm.id}" data-area="${farm.area}" onchange="updatePreview()" class="w-5 h-5 text-slate-900 rounded border-slate-300">
+            <span class="text-sm font-semibold text-slate-800 break-all">${farm.displayText}</span>
+          </div>
+        </label>
+      `).join('');
+    }
+
+    function filterFarms() {
+      const keyword = document.getElementById('farmSearch').value.toLowerCase().trim();
+      renderFarmList(globalFarmList.filter(f => f.displayText.toLowerCase().includes(keyword)));
+    }
+
+    function updatePreview() {
+      const supCount = parseInt(document.getElementById('supervisorCount').value) || 0;
+      const workerCount = parseInt(document.getElementById('workerCount').value) || 0;
+      const netHours = calculateNetHours(document.getElementById('startTime').value, document.getElementById('endTime').value, document.getElementById('breakHours').value);
+
+      document.getElementById('netHoursBadge').innerText = `淨工時: ${netHours.toFixed(1)} 小時`;
+      document.getElementById('overtimeNotice').classList.toggle('hidden', netHours <= 8);
+
+      const totalCost = Math.round((supCount * calculateSupervisorDailyCost(netHours)) + (workerCount * calculateWorkerDailyCost(netHours)));
+      const checkedBoxes = document.querySelectorAll('input[name="selectedFarms"]:checked');
+      let totalArea = 0;
+      checkedBoxes.forEach(cb => { totalArea += parseFloat(cb.getAttribute('data-area')) || 0; });
+
+      document.getElementById('selectedCount').innerText = `已選 ${checkedBoxes.length} 塊地`;
+      document.getElementById('previewCost').innerText = `$${totalCost.toLocaleString()}`;
+      document.getElementById('previewArea').innerText = `${totalArea.toFixed(2)} 分`;
+      document.getElementById('previewUnitCost').innerText = `$${totalArea > 0 ? Math.round(totalCost / totalArea).toLocaleString() : 0} /分`;
+      document.getElementById('previewCumulativeAvgCost').innerText = `$${globalCumulativeAvgCost.toLocaleString()} /分`;
+    }
+
+    function buildLineFlexMessage(summary) {
+      const netHours = parseFloat(summary.netHours || 8.0);
+      const isOt = netHours > 8;
+      const unitCost = Number(summary.unitCost) || 0;
+      const cumAvgCost = Number(summary.cumAvgCost) || 0;
+      const isCheaper = (unitCost - cumAvgCost) <= 0;
+      const totalArea = parseFloat(summary.totalArea) || 0;
+
+      return {
+        type: "flex",
+        altText: `💧 田間水管鋪設日報 (${summary.date}) - 完工 ${totalArea.toFixed(2)} 分地`,
+        contents: {
+          type: "bubble", size: "mega",
+          header: {
+            type: "box", layout: "vertical", backgroundColor: "#0f172a", paddingAll: "20px",
+            contents: [
+              {
+                type: "box", layout: "horizontal",
+                contents: [
+                  { type: "text", text: "💧 田間水管鋪設日報", weight: "bold", color: "#ffffff", size: "lg", flex: 1 },
+                  { type: "text", text: summary.date, color: "#94a3b8", size: "xs", align: "end", gravity: "center" }
+                ]
+              },
+              { type: "text", text: `⏰ 工時: ${summary.startTime||'08:00'}~${summary.endTime||'17:00'} (淨 ${netHours.toFixed(1)} hr${isOt ? ' ‧ 含加班' : ''})`, color: "#94a3b8", size: "xxs", marginTop: "4px" }
+            ]
+          },
+          body: {
+            type: "box", layout: "vertical", paddingAll: "20px", spacing: "md",
+            contents: [
+              {
+                type: "box", layout: "horizontal", backgroundColor: "#f8fafc", cornerRadius: "12px", paddingAll: "14px",
+                contents: [
+                  {
+                    type: "box", layout: "vertical", align: "center", flex: 1,
+                    contents: [
+                      { type: "text", text: "今日完工面積", size: "xxs", color: "#64748b" },
+                      { type: "text", text: totalArea.toFixed(2), size: "xl", weight: "bold", color: "#10b981", marginTop: "2px" },
+                      { type: "text", text: "分地", size: "xxs", color: "#10b981" }
+                    ]
+                  },
+                  { type: "separator", color: "#e2e8f0" },
+                  {
+                    type: "box", layout: "vertical", align: "center", flex: 1,
+                    contents: [
+                      { type: "text", text: "今日單位成本", size: "xxs", color: "#64748b" },
+                      { type: "text", text: `$${Math.round(unitCost).toLocaleString()}`, size: "xl", weight: "bold", color: "#0284c7", marginTop: "2px" },
+                      { type: "text", text: "元/分", size: "xxs", color: "#0284c7" }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: "box", layout: "horizontal", backgroundColor: isCheaper ? "#f0fdf4" : "#fef2f2", cornerRadius: "8px", paddingAll: "8px",
+                contents: [{ type: "text", text: `📊 全場歷史累積平均成本：$${Math.round(cumAvgCost).toLocaleString()} 元/分 (${isCheaper ? '🟢 低於平均' : '🔴 高於平均'})`, size: "xxs", color: isCheaper ? "#166534" : "#991b1b", align: "center", flex: 1 }]
+              },
+              {
+                type: "box", layout: "vertical", margin: "md", spacing: "sm",
+                contents: [
+                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "📍 完工地號", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: `${summary.farmIds} (${summary.farmCount}塊地)`, color: "#0f172a", size: "xs", weight: "bold", flex: 4, align: "end", wrap: true }] },
+                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "👥 出勤人力", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: `主管 ${summary.supervisorCount} 人 / 組員 ${summary.workerCount} 人`, color: "#0f172a", size: "xs", weight: "bold", flex: 4, align: "end" }] },
+                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "🏷️ 出勤人員", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: summary.staffNames || '無', color: "#334155", size: "xs", flex: 4, align: "end", wrap: true }] },
+                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "💰 今日總成本", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: `$${Number(summary.totalCost).toLocaleString()} 元`, color: "#d97706", size: "xs", weight: "bold", flex: 4, align: "end" }] },
+                  { type: "box", layout: "horizontal", contents: [{ type: "text", text: "📝 現場備註", color: "#64748b", size: "xs", flex: 2 }, { type: "text", text: summary.note || '無', color: "#334155", size: "xs", flex: 4, align: "end", wrap: true }] }
+                ]
+              }
+            ]
+          },
+          footer: {
+            type: "box", layout: "vertical", backgroundColor: "#f8fafc", paddingAll: "12px",
+            contents: [{ type: "text", text: "✅ 數據已自動同步寫入施工紀錄試算表", size: "xxs", color: "#94a3b8", align: "center" }]
+          }
+        }
+      };
+    }
+
+    document.getElementById('reportForm').onsubmit = function(e) {
+      e.preventDefault();
+
+      const checkedBoxes = document.querySelectorAll('input[name="selectedFarms"]:checked');
+      if (checkedBoxes.length === 0) {
+        showToast('⚠️ 請至少勾選一塊施工農地！', true);
+        return;
+      }
+
+      const noteSelect = document.getElementById('note').value;
+      const formData = {
+        date: document.getElementById('date').value,
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+        restHours: document.getElementById('breakHours').value,
+        supervisorCount: document.getElementById('supervisorCount').value,
+        workerCount: document.getElementById('workerCount').value,
+        staffNames: selectedStaffNames.join(', '),
+        farmIds: Array.from(checkedBoxes).map(cb => cb.value).join(', '),
+        note: noteSelect === '其他' ? document.getElementById('customNote').value : noteSelect
+      };
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ 資料寫入中...</span>';
+
+      fetch(GAS_API_URL, {
+        method: 'POST',
+        body: JSON.stringify(formData)
+      })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.innerHTML = '<span>送出並發送日報至本聊天室</span>';
+
+        if (res && res.success) {
+          showToast('✅ 成功寫入試算表！');
+          const summary = res.data;
+          const flexMsg = buildLineFlexMessage(summary);
+
+          // 核心推播發送
+          if (liffReady && liff.isInClient && liff.isInClient()) {
+            liff.sendMessages([flexMsg])
+              .then(() => {
+                showToast('🚀 已自動直接傳送到本聊天室！');
+                setTimeout(() => liff.closeWindow(), 1000);
+              })
+              .catch(err => {
+                showToast('⚠️ 自動推播失敗: ' + err.message, true);
+              });
+          } else {
+            showToast('💡 成功寫入！目前非 LIFF 環境');
+          }
+        } else {
+          showToast('❌ 寫入失敗', true);
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<span>送出並發送日報至本聊天室</span>';
+        showToast('❌ 請求異常: ' + err.toString(), true);
+      });
+    };
+  </script>
+</body>
+</html>
