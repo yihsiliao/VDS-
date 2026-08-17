@@ -35,7 +35,7 @@
       <span class="text-xl">💧</span>
       <h1 class="text-xl font-bold tracking-wide">田間水管鋪設日報</h1>
     </div>
-    <p class="text-xs text-slate-400 mt-1">GitHub 託管 ‧ 自動純文字推播與成本試算</p>
+    <p class="text-xs text-slate-400 mt-1">獨立計薪 ‧ 油資試算 ‧ 自動推播</p>
   </div>
 
   <!-- 載入動畫 -->
@@ -57,7 +57,7 @@
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
       <div class="flex justify-between items-center border-b pb-2 border-slate-100">
         <label class="block text-xs font-bold text-slate-500 uppercase">⏰ 上下班時間與休息時長</label>
-        <span id="netHoursBadge" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">工時: 8.0 小時</span>
+        <span id="netHoursBadge" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">淨工時: 8.0 小時</span>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
@@ -80,19 +80,19 @@
         </select>
       </div>
       <div id="overtimeNotice" class="hidden text-[11px] text-amber-700 bg-amber-50 p-2 rounded-xl border border-amber-200">
-        ⚡ 包含加班工時！第 1-2 小時 (1.34倍) / 第 3-4 小時 (1.67倍)（主管基數 $139.5/hr，組員基數 $127/hr）
+        ⚡ 包含加班！將依據點選之人員獨立計算加班倍率與薪資。
       </div>
     </div>
 
     <!-- 人員點選 -->
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
       <div class="flex justify-between items-center">
-        <label class="block text-xs font-bold text-slate-500 uppercase">出勤人力與名單點選</label>
+        <label class="block text-xs font-bold text-slate-500 uppercase">出勤人力點選</label>
         <span id="selectedStaffBadge" class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">已點選 0 人</span>
       </div>
-      <div class="pt-1 pb-2 border-b border-slate-100">
+      <div class="pt-1 pb-2">
         <div class="text-[11px] text-slate-400 font-medium mb-2 flex items-center justify-between">
-          <span>👥 今日出勤名單：</span>
+          <span>👥 系統會依選取名單自動算薪：</span>
           <div class="space-x-1">
             <button type="button" onclick="selectAllStaff(true)" class="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded">全選</button>
             <button type="button" onclick="selectAllStaff(false)" class="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded">清除</button>
@@ -100,28 +100,19 @@
         </div>
         <div id="staffChipContainer" class="flex flex-wrap gap-2"></div>
       </div>
-      
-      <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-        <div>
-          <span class="font-bold text-slate-800 block text-sm">👨‍🌾 移工主管</span>
-          <span class="text-xs text-slate-500">日薪 $2,780 元/日</span>
-        </div>
-        <div class="flex items-center space-x-3">
-          <button type="button" class="stepper-btn" onclick="adjustCount('supervisorCount', -1)">-</button>
-          <input type="number" id="supervisorCount" name="supervisorCount" value="1" min="0" readonly class="w-8 text-center text-lg font-bold bg-transparent">
-          <button type="button" class="stepper-btn" onclick="adjustCount('supervisorCount', 1)">+</button>
-        </div>
-      </div>
+    </div>
 
-      <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+    <!-- 出車數量 -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+      <div class="flex items-center justify-between">
         <div>
-          <span class="font-bold text-slate-800 block text-sm">👷‍♂️ 移工組員</span>
-          <span class="text-xs text-slate-500">日薪 $2,643 元/日</span>
+          <span class="font-bold text-slate-800 block text-sm">🚗 出勤車輛數</span>
+          <span class="text-xs text-slate-500">每輛車補貼 $500 元油資</span>
         </div>
         <div class="flex items-center space-x-3">
-          <button type="button" class="stepper-btn" onclick="adjustCount('workerCount', -1)">-</button>
-          <input type="number" id="workerCount" name="workerCount" value="3" min="0" readonly class="w-8 text-center text-lg font-bold bg-transparent">
-          <button type="button" class="stepper-btn" onclick="adjustCount('workerCount', 1)">+</button>
+          <button type="button" class="stepper-btn" onclick="adjustCount('carCount', -1)">-</button>
+          <input type="number" id="carCount" name="carCount" value="0" min="0" readonly class="w-8 text-center text-lg font-bold bg-transparent focus:outline-none">
+          <button type="button" class="stepper-btn" onclick="adjustCount('carCount', 1)">+</button>
         </div>
       </div>
     </div>
@@ -143,8 +134,9 @@
       </div>
       <div class="grid grid-cols-2 gap-3 text-center pt-1 border-b border-slate-800 pb-2">
         <div>
-          <div class="text-[11px] text-slate-400 mb-1">今日總人力成本</div>
-          <div id="previewCost" class="text-lg font-bold text-amber-400">$10,709</div>
+          <div class="text-[11px] text-slate-400 mb-1">今日總人力與油資</div>
+          <div id="previewCost" class="text-lg font-bold text-amber-400">$0</div>
+          <div id="previewDetailText" class="text-[9px] text-slate-400 mt-1">薪資 $0 + 油資 $0</div>
         </div>
         <div>
           <div class="text-[11px] text-slate-400 mb-1">勾選完工總面積</div>
@@ -178,7 +170,7 @@
 
     <!-- 提交按鈕 -->
     <button type="submit" id="submitBtn" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-98 transition-all text-base flex items-center justify-center space-x-2">
-      <span>送出並發送日報至本聊天室</span>
+      <span>送出並發送純文字日報至聊天室</span>
     </button>
   </form>
 
@@ -187,8 +179,6 @@
     let globalCumulativeAvgCost = 0;
     const STAFF_LIST = ['文統', '芳河', '謝練', '文全', '士雄', '波朱', '功維', '成龍'];
     let selectedStaffNames = [];
-    const COST_SUPERVISOR = 2780, COST_WORKER = 2643;
-    const OT_HOURLY_SUPERVISOR = 139.5, OT_HOURLY_WORKER = 127;
     let liffReady = false;
 
     document.getElementById('date').value = new Date().toISOString().split('T')[0];
@@ -200,17 +190,13 @@
       const farmTimeout = setTimeout(() => {
         if (!loaded) {
           loaded = true;
-          console.warn('LIFF 初始化時間較長，先行載入農地');
           loadFarms();
         }
       }, 3000);
 
       if (typeof liff !== 'undefined' && LIFF_ID) {
         liff.init({ liffId: LIFF_ID })
-          .then(() => {
-            liffReady = true;
-            console.log("LIFF Init success, isInClient:", liff.isInClient());
-          })
+          .then(() => { liffReady = true; })
           .catch(err => console.warn('LIFF Init error:', err))
           .finally(() => {
             if (!loaded) {
@@ -253,6 +239,7 @@
           if (selectedStaffNames.includes(name)) selectedStaffNames = selectedStaffNames.filter(n => n !== name);
           else selectedStaffNames.push(name);
           renderStaffChips();
+          updatePreview();
         };
         container.appendChild(chip);
       });
@@ -262,6 +249,7 @@
     function selectAllStaff(selectAll) {
       selectedStaffNames = selectAll ? [...STAFF_LIST] : [];
       renderStaffChips();
+      updatePreview();
     }
 
     function showToast(message, isError = false) {
@@ -274,9 +262,7 @@
 
     function hideToast() {
       const toast = document.getElementById('toast');
-      if (toast) {
-        toast.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none');
-      }
+      if (toast) toast.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none');
     }
 
     function calculateNetHours(startTime, endTime, breakHours) {
@@ -287,16 +273,20 @@
       return Math.max(0, raw - parseFloat(breakHours || 0));
     }
 
-    function calculateSupervisorDailyCost(netHours) {
-      if (netHours <= 8) return COST_SUPERVISOR;
-      const ot1 = Math.min(Math.max(0, netHours - 8), 2), ot2 = Math.min(Math.max(0, netHours - 10), 2);
-      return COST_SUPERVISOR + (ot1 * OT_HOURLY_SUPERVISOR * 1.34) + (ot2 * OT_HOURLY_SUPERVISOR * 1.67);
+    function getStaffRate(name) {
+      if (name === '文統') return { base: 2284, ot: 139.5 };
+      if (name === '功維') return { base: 2306, ot: 141.6 };
+      if (name === '文全') return { base: 2238, ot: 135.4 };
+      if (name === '芳河' || name === '謝練') return { base: 2147, ot: 127 };
+      return { base: 2102, ot: 123 };
     }
 
-    function calculateWorkerDailyCost(netHours) {
-      if (netHours <= 8) return COST_WORKER;
-      const ot1 = Math.min(Math.max(0, netHours - 8), 2), ot2 = Math.min(Math.max(0, netHours - 10), 2);
-      return COST_WORKER + (ot1 * OT_HOURLY_WORKER * 1.34) + (ot2 * OT_HOURLY_WORKER * 1.67);
+    function calculateIndividualCost(name, netHours) {
+      const rate = getStaffRate(name);
+      if (netHours <= 8) return rate.base;
+      const ot1 = Math.min(Math.max(0, netHours - 8), 2);
+      const ot2 = Math.max(0, netHours - 10);
+      return Math.round(rate.base + (ot1 * rate.ot * 1.34) + (ot2 * rate.ot * 1.67));
     }
 
     function adjustCount(id, delta) {
@@ -345,26 +335,34 @@
     }
 
     function updatePreview() {
-      const supCount = parseInt(document.getElementById('supervisorCount').value) || 0;
-      const workerCount = parseInt(document.getElementById('workerCount').value) || 0;
       const netHours = calculateNetHours(document.getElementById('startTime').value, document.getElementById('endTime').value, document.getElementById('breakHours').value);
-
-      document.getElementById('netHoursBadge').innerText = `工時: ${netHours.toFixed(1)} 小時`;
+      document.getElementById('netHoursBadge').innerText = `淨工時: ${netHours.toFixed(1)} 小時`;
       document.getElementById('overtimeNotice').classList.toggle('hidden', netHours <= 8);
 
-      const totalCost = Math.round((supCount * calculateSupervisorDailyCost(netHours)) + (workerCount * calculateWorkerDailyCost(netHours)));
+      let totalManpowerCost = 0;
+      selectedStaffNames.forEach(name => {
+        totalManpowerCost += calculateIndividualCost(name, netHours);
+      });
+
+      const carCount = parseInt(document.getElementById('carCount').value) || 0;
+      const totalCarCost = carCount * 500;
+      const totalCost = totalManpowerCost + totalCarCost;
+
       const checkedBoxes = document.querySelectorAll('input[name="selectedFarms"]:checked');
       let totalArea = 0;
       checkedBoxes.forEach(cb => { totalArea += parseFloat(cb.getAttribute('data-area')) || 0; });
 
+      const unitCost = totalArea > 0 ? (totalCost / totalArea) : 0;
+
       document.getElementById('selectedCount').innerText = `已選 ${checkedBoxes.length} 塊地`;
       document.getElementById('previewCost').innerText = `$${totalCost.toLocaleString()}`;
+      document.getElementById('previewDetailText').innerText = `薪資 $${totalManpowerCost.toLocaleString()} + 油資 $${totalCarCost.toLocaleString()}`;
       document.getElementById('previewArea').innerText = `${totalArea.toFixed(2)} 分`;
-      document.getElementById('previewUnitCost').innerText = `$${totalArea > 0 ? Math.round(totalCost / totalArea).toLocaleString() : 0} /分`;
+      document.getElementById('previewUnitCost').innerText = `$${Math.round(unitCost).toLocaleString()} /分`;
       document.getElementById('previewCumulativeAvgCost').innerText = `$${globalCumulativeAvgCost.toLocaleString()} /分`;
     }
 
-    // ⭐️ 生成高排版質感純文字日報訊息
+    // ⭐️ 純文字日報產生器 (新增油資欄位)
     function buildPlainTextSummary(s) {
       const netHours = parseFloat(s.netHours || 8.0);
       const isOt = netHours > 8;
@@ -375,24 +373,30 @@
 
       return `💧【田間水管鋪設日報】\n` +
              `📅 日期：${s.date}\n` +
-             `⏰ 工時：${s.startTime || '08:00'}~${s.endTime || '17:00'} ( ${netHours.toFixed(1)} hr${isOt ? ' ‧ 含加班' : ''})\n` +
+             `⏰ 工時：${s.startTime || '08:00'}~${s.endTime || '17:00'} (淨 ${netHours.toFixed(1)} hr${isOt ? ' ‧ 含加班' : ''})\n` +
              `-------------------------\n` +
              `📏 完工總面積：${totalArea.toFixed(2)} 分地 (${s.farmCount} 塊地)\n` +
              `📍 完工地號：${s.farmIds}\n` +
-             `👥 出勤人力：主管 ${s.supervisorCount} 人 / 組員 ${s.workerCount} 人\n` +
-             `🏷️ 出勤人員：${s.staffNames || '無'}\n` +
+             `👥 出勤總人數：${s.staffCount} 人\n` +
+             `🏷️ 出勤名單：${s.staffNames || '無'}\n` +
              `-------------------------\n` +
              `💰 今日總成本：$${Number(s.totalCost).toLocaleString()} 元\n` +
+             `  └ 薪資成本：$${Number(s.manpowerCost).toLocaleString()} 元\n` +
+             `  └ 車輛油資：$${Number(s.carCost).toLocaleString()} 元 (${s.carCount} 輛)\n` +
              `⚡ 今日單位成本：$${Math.round(unitCost).toLocaleString()} 元/分\n` +
-             `📊 累積單位成本：$${Math.round(cumAvgCost).toLocaleString()} 元/分 (${isCheaper ? '🟢 低於平均' : '🔴 高於平均'})\n` +
+             `📊 歷史累積均價：$${Math.round(cumAvgCost).toLocaleString()} 元/分 (${isCheaper ? '🟢 低於平均' : '🔴 高於平均'})\n` +
              `📝 現場備註：${s.note || '無'}\n` +
              `-------------------------\n` +
-             `✅ 數據已自動同步至水管施工紀錄試算表`;
+             `✅ 數據已自動同步至試算表`;
     }
 
-    // 表單送出與純文字推播
     document.getElementById('reportForm').onsubmit = function(e) {
       e.preventDefault();
+
+      if (selectedStaffNames.length === 0) {
+        showToast('⚠️ 請至少點選一位出勤人員！', true);
+        return;
+      }
 
       const checkedBoxes = document.querySelectorAll('input[name="selectedFarms"]:checked');
       if (checkedBoxes.length === 0) {
@@ -406,8 +410,7 @@
         startTime: document.getElementById('startTime').value,
         endTime: document.getElementById('endTime').value,
         restHours: document.getElementById('breakHours').value,
-        supervisorCount: document.getElementById('supervisorCount').value,
-        workerCount: document.getElementById('workerCount').value,
+        carCount: document.getElementById('carCount').value,
         staffNames: selectedStaffNames.join(', '),
         farmIds: Array.from(checkedBoxes).map(cb => cb.value).join(', '),
         note: noteSelect === '其他' ? document.getElementById('customNote').value : noteSelect
@@ -425,46 +428,28 @@
       .then(res => res.text())
       .then(text => {
         let res;
-        try {
-          res = JSON.parse(text);
-        } catch(e) {
-          throw new Error("Google 未回傳 JSON。");
-        }
+        try { res = JSON.parse(text); } 
+        catch(e) { throw new Error("Google 未回傳 JSON。"); }
 
         btn.disabled = false;
-        btn.innerHTML = '<span>送出並發送日報至本聊天室</span>';
+        btn.innerHTML = '<span>送出並發送純文字日報至聊天室</span>';
 
         if (res && res.success) {
           showToast('✅ 成功寫入試算表！');
-          const summary = res.data;
+          const textMsg = { type: "text", text: buildPlainTextSummary(res.data) };
 
-          // 1. 建立純文字訊息物件
-          const textMsg = {
-            type: "text",
-            text: buildPlainTextSummary(summary)
-          };
-
-          // 2. 檢查開啟環境
-          if (!liff.isInClient()) {
-            alert('⚠️ 無法自動推播：因為您點擊的不是 LINE 聊天室內的專屬短網址 (liff.line.me)，或者非 LINE 內部開啟！');
+          if (!liff.isInClient() || typeof liff.sendMessages !== 'function') {
+            alert('⚠️ 無法自動推播，可能不在 LINE 的短網址中開啟！');
             return;
           }
 
-          if (typeof liff.sendMessages !== 'function') {
-            alert('⚠️ 無法自動推播：目前的開啟情境不支援 sendMessages 函式。');
-            return;
-          }
-
-          // 3. 發送純文字訊息
           liff.sendMessages([textMsg])
             .then(() => {
-              showToast('🚀 已自動直接傳送到本聊天室！');
+              showToast('🚀 已傳送日報至聊天室！');
               setTimeout(() => liff.closeWindow(), 1200);
             })
             .catch(err => {
-              alert('❌ LINE 拒絕發送訊息！\n' +
-                    '錯誤代碼: ' + (err.code || '無') + '\n' +
-                    '詳細原因: ' + (err.message || JSON.stringify(err)));
+              alert('❌ LINE 拒絕發送訊息！\n原因: ' + (err.message || JSON.stringify(err)));
             });
 
         } else {
@@ -473,7 +458,7 @@
       })
       .catch(err => {
         btn.disabled = false;
-        btn.innerHTML = '<span>送出並發送日報至本聊天室</span>';
+        btn.innerHTML = '<span>送出並發送純文字日報至聊天室</span>';
         showToast('❌ API 請求異常: ' + err.message, true);
       });
     };
